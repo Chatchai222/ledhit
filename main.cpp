@@ -38,12 +38,12 @@ DigitalOut clicker_led(P0_15, 1);
 InterruptIn clicker_interrupt(P0_16); // this will be connected to button
 
 
-
-
 // Defining functions
 void led_line_initialize();
 void led_line_hop();
+void led_line_toggle_current_led();
 
+void hopper_ticker_routine();
 void hopper_ticker_enable();
 void hopper_ticker_disable();
 void hopper_delay_set();
@@ -74,9 +74,17 @@ void led_line_hop(){
 	led_line_digital_out_vector.at(led_line_current_index).write(1);
 }
 
+void led_line_toggle_current_led(){
+	led_line_digital_out_vector.at(led_line_current_index) = !led_line_digital_out_vector.at(led_line_current_index);
+}
+
 // Functions for hopper
+void hopper_ticker_routine(){
+	led_line_hop();
+}
+
 void hopper_ticker_enable(){
-	hopper_ticker.attach(led_line_hop, hopper_delay);
+	hopper_ticker.attach(hopper_ticker_routine, hopper_delay);
 }
 
 void hopper_ticker_disable(){
