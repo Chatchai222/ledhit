@@ -11,6 +11,7 @@ https://www.betsonparts.com/media/hbi/service-manuals/355/Cyclone%20Service%20Ma
 #include <vector>
 
 // Defining macros and definitions
+DigitalOut ALWAYS_HIGH(P2_13);
 
 const int led_line_array_size = 7;
 std::vector<DigitalOut> led_line_digital_out_vector;
@@ -25,11 +26,32 @@ PinName led_line_pin_name_array[led_line_array_size] = {
 };
 int led_line_current_index = 0;
 
+Ticker hopper_ticker;
+float hopper_delay = 0.2;
+
+Timeout clicker_timeout;
+const float CLICKER_COOLDOWN = 2; // in seconds
+DigitalOut clicker_led(P0_15, 0);
+InterruptIn clicker_interrupt(P0_16); // this will be connected to button
 
 
+
+
+// Defining functions
 void led_line_initialize();
 void led_line_hop();
 
+void hopper_ticker_enable();
+void hopper_ticker_disable();
+void hopper_delay_set();
+
+void clicker_interrupt_enable();
+void clicker_interrupt_disable();
+void clicker_interrupt_routine();
+void clicker_timeout_routine();
+
+
+// Function for the led_line
 void led_line_initialize(){
 	for(int i = 0; i < led_line_array_size; i++){
 		led_line_digital_out_vector.push_back(DigitalOut(led_line_pin_name_array[i]));
@@ -43,8 +65,42 @@ void led_line_hop(){
 	led_line_digital_out_vector.at(led_line_current_index).write(1);
 }
 
+// Functions for hopper
+void hopper_ticker_enable(){
+	hopper_ticker.attach(led_line_hop, hopper_delay);
+}
+
+void hopper_ticker_disable(){
+	hopper_ticker.detach();
+}
+
+void hopper_delay_set(float second){
+	hopper_delay = second;
+}
+
+// Function for clicker
+void clicker_interrupt_enable(){
+	clicker_interrupt.rise(clicker_interrupt_routine);
+}
+
+void clicker_interrupt_disable(){
+	clicker_interrupt.disable_irq();
+}
+
+void clicker_interrupt_routine(){
+	clicker_led = !clicker_led;
+}
+
+void clicker_timeout_routine(){
+	
+}
+
+
 int main(){
+	ALWAYS_HIGH.write(1);
 	led_line_initialize();
+	hopper_ticker_enable();
+	clicker_interrupt_enable();
 
 	// The while loop keep the program running
 	DigitalOut board_led2(P0_22);
