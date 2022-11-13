@@ -140,10 +140,14 @@ float clicker_cooldown_get(){
 
 void _clicker_interrupt_routine_begin(){
 	clicker_interrupt_disable();
+	hopper_ticker_disable();
+	blinker_ticker_enable();
 	clicker_led.write(0);
 }
 
 void _clicker_interrupt_routine_end(){
+	blinker_ticker_disable();
+	hopper_ticker_enable();
 	clicker_interrupt_enable();
 	clicker_led.write(1);
 }
