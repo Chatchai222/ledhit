@@ -1,3 +1,4 @@
 # Ignore all file with "." as the start except .gitignore
 .*
 !.gitignore
+Debug/
