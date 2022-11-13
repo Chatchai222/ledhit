@@ -1,10 +1,8 @@
 /*
 2022 Nov
 This project is the KMITL university microprocessor class
-
 This project is simple version of the arcade game called "cyclone"
 https://www.betsonparts.com/media/hbi/service-manuals/355/Cyclone%20Service%20Manual%2012-1-09.pdf
-
 */
 
 #include "mbed.h"
@@ -156,14 +154,7 @@ void _clicker_interrupt_routine_end(){
 // This function can be deleted
 // This was for testing and check purposes
 void temp_test(){
-	for(int i = 0; i < 5; i++){
-		hopper_ticker_disable();
-		blinker_ticker_enable();
-		wait(2);
-		blinker_ticker_disable();
-		hopper_ticker_enable();
-		wait(2);
-	}
+	
 }
 
 int main(){
