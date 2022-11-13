@@ -51,10 +51,12 @@ void hopper_delay_set();
 void blinker_ticker_routine();
 void blinker_ticker_enable();
 void blinker_ticker_disable();
+float _blinker_blink_delay_get();
 
 void clicker_interrupt_enable();
 void clicker_interrupt_disable();
 void clicker_interrupt_routine();
+float clicker_cooldown_get();
 void _clicker_interrupt_routine_begin();
 void _clicker_interrupt_routine_end();
 
@@ -96,17 +98,24 @@ void hopper_delay_set(float second){
 }
 
 
-// Function for blinker
+// Function for blinker 
 void blinker_ticker_routine(){
-	
+	led_line_toggle_current_led();
 }
 
 void blinker_ticker_enable(){
-	
+	blinker_ticker.attach(blinker_ticker_routine, _blinker_blink_delay_get());
 }
 
 void blinker_ticker_disable(){
+	blinker_ticker.detach();
+}
 
+float _blinker_blink_delay_get(){
+	float output;
+	float duration_to_blink = clicker_cooldown_get();
+	output = duration_to_blink / ((BLINKER_BLINK_AMOUNT * 2) + 1); // The + 1 is for final toggle off
+	return output;
 }
 
 
@@ -125,6 +134,10 @@ void clicker_interrupt_routine(){
 	clicker_timeout.attach(_clicker_interrupt_routine_end, CLICKER_COOLDOWN);
 }
 
+float clicker_cooldown_get(){
+	return CLICKER_COOLDOWN;
+}
+
 void _clicker_interrupt_routine_begin(){
 	clicker_interrupt_disable();
 	clicker_led.write(0);
@@ -135,11 +148,27 @@ void _clicker_interrupt_routine_end(){
 	clicker_led.write(1);
 }
 
+
+// This function can be deleted
+// This was for testing and check purposes
+void temp_test(){
+	for(int i = 0; i < 5; i++){
+		hopper_ticker_disable();
+		blinker_ticker_enable();
+		wait(2);
+		blinker_ticker_disable();
+		hopper_ticker_enable();
+		wait(2);
+	}
+}
+
 int main(){
 	ALWAYS_HIGH.write(1);
 	led_line_initialize();
 	hopper_ticker_enable();
 	clicker_interrupt_enable();
+
+	temp_test();
 
 	// The while loop keep the program running
 	DigitalOut board_led2(P0_22);
