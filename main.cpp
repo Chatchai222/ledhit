@@ -13,9 +13,9 @@ https://www.betsonparts.com/media/hbi/service-manuals/355/Cyclone%20Service%20Ma
 // Defining macros and definitions
 DigitalOut ALWAYS_HIGH(P2_13);
 
-const int led_line_array_size = 7;
+const int LED_LINE_ARRAY_SIZE = 7;
 std::vector<DigitalOut> led_line_digital_out_vector;
-PinName led_line_pin_name_array[led_line_array_size] = {
+PinName led_line_pin_name_array[LED_LINE_ARRAY_SIZE] = {
 	P0_9,
 	P0_8,
 	P0_7,
@@ -31,7 +31,7 @@ float hopper_delay = 0.2;
 
 Timeout clicker_timeout;
 const float CLICKER_COOLDOWN = 2; // in seconds
-DigitalOut clicker_led(P0_15, 0);
+DigitalOut clicker_led(P0_15, 1);
 InterruptIn clicker_interrupt(P0_16); // this will be connected to button
 
 
@@ -48,12 +48,14 @@ void hopper_delay_set();
 void clicker_interrupt_enable();
 void clicker_interrupt_disable();
 void clicker_interrupt_routine();
-void clicker_timeout_routine();
+void _clicker_interrupt_routine_begin();
+void _clicker_interrupt_routine_end();
+
 
 
 // Function for the led_line
 void led_line_initialize(){
-	for(int i = 0; i < led_line_array_size; i++){
+	for(int i = 0; i < LED_LINE_ARRAY_SIZE; i++){
 		led_line_digital_out_vector.push_back(DigitalOut(led_line_pin_name_array[i]));
 	}
 }
@@ -61,7 +63,7 @@ void led_line_initialize(){
 void led_line_hop(){
 	led_line_digital_out_vector.at(led_line_current_index).write(0);
 	led_line_current_index++;
-	led_line_current_index %= led_line_array_size;
+	led_line_current_index %= LED_LINE_ARRAY_SIZE;
 	led_line_digital_out_vector.at(led_line_current_index).write(1);
 }
 
@@ -80,6 +82,7 @@ void hopper_delay_set(float second){
 
 // Function for clicker
 void clicker_interrupt_enable(){
+	clicker_interrupt.enable_irq();
 	clicker_interrupt.rise(clicker_interrupt_routine);
 }
 
@@ -88,13 +91,19 @@ void clicker_interrupt_disable(){
 }
 
 void clicker_interrupt_routine(){
-	clicker_led = !clicker_led;
+	_clicker_interrupt_routine_begin();
+	clicker_timeout.attach(_clicker_interrupt_routine_end, CLICKER_COOLDOWN);
 }
 
-void clicker_timeout_routine(){
-	
+void _clicker_interrupt_routine_begin(){
+	clicker_interrupt_disable();
+	clicker_led.write(0);
 }
 
+void _clicker_interrupt_routine_end(){
+	clicker_interrupt_enable();
+	clicker_led.write(1);
+}
 
 int main(){
 	ALWAYS_HIGH.write(1);
