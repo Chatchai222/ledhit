@@ -29,6 +29,9 @@ int led_line_current_index = 0;
 Ticker hopper_ticker;
 float hopper_delay = 0.2;
 
+Ticker blinker_ticker;
+const int BLINKER_BLINK_AMOUNT = 6;
+
 Timeout clicker_timeout;
 const float CLICKER_COOLDOWN = 2; // in seconds
 DigitalOut clicker_led(P0_15, 1);
@@ -44,6 +47,10 @@ void led_line_hop();
 void hopper_ticker_enable();
 void hopper_ticker_disable();
 void hopper_delay_set();
+
+void blinker_ticker_routine();
+void blinker_ticker_enable();
+void blinker_ticker_disable();
 
 void clicker_interrupt_enable();
 void clicker_interrupt_disable();
@@ -79,6 +86,21 @@ void hopper_ticker_disable(){
 void hopper_delay_set(float second){
 	hopper_delay = second;
 }
+
+
+// Function for blinker
+void blinker_ticker_routine(){
+	
+}
+
+void blinker_ticker_enable(){
+	
+}
+
+void blinker_ticker_disable(){
+
+}
+
 
 // Function for clicker
 void clicker_interrupt_enable(){
