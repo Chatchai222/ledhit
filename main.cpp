@@ -9,7 +9,7 @@ https://www.betsonparts.com/media/hbi/service-manuals/355/Cyclone%20Service%20Ma
 #include <vector>
 
 // Defining macros and definitions
-DigitalOut ALWAYS_HIGH(P2_13);
+DigitalOut ALWAYS_HIGH(P2_13, 1);
 
 const int LED_LINE_ARRAY_SIZE = 7;
 std::vector<DigitalOut> led_line_digital_out_vector;
@@ -35,6 +35,14 @@ const float CLICKER_COOLDOWN = 2; // in seconds
 DigitalOut clicker_led(P0_15, 1);
 InterruptIn clicker_interrupt(P0_16); // this will be connected to button
 
+// HiTEC HS-311 servo motor
+// https://hitecrcd.com/products/servos/analog/sport-2/hs-311/product
+PwmOut servo_motor_pwm_out(P2_0);
+int servo_motor_position_degree = 0;
+const float SERVO_MOTOR_DEFAULT_PERIOD_SECOND = 0.020;
+const float SERVO_MOTOR_PULSEWIDTH_MICROSECOND_AT_ZERO_DEGREE = 600;
+const float SERVO_MOTOR_PULSEWIDTH_MICROSECOND_PER_DEGREE = 10;
+
 
 // Defining functions
 void led_line_initialize();
@@ -57,6 +65,11 @@ void clicker_interrupt_routine();
 float clicker_cooldown_get();
 void _clicker_interrupt_routine_begin();
 void _clicker_interrupt_routine_end();
+
+void servo_motor_initialize();
+void servo_motor_position_degree_set(int);
+int _servo_motor_pulsewidth_us_get_from_position_degree();
+
 
 
 
@@ -151,17 +164,42 @@ void _clicker_interrupt_routine_end(){
 }
 
 
+// Servo motor functions
+void servo_motor_initialize(){
+	servo_motor_pwm_out.period(SERVO_MOTOR_DEFAULT_PERIOD_SECOND);
+	servo_motor_position_degree_set(0);
+}
+
+void servo_motor_position_degree_set(int degree){
+	servo_motor_position_degree = degree;
+	int pulsewidth_us = _servo_motor_pulsewidth_us_get_from_position_degree();
+	servo_motor_pwm_out.pulsewidth_us(pulsewidth_us);
+}
+
+int _servo_motor_pulsewidth_us_get_from_position_degree(){
+	return SERVO_MOTOR_PULSEWIDTH_MICROSECOND_AT_ZERO_DEGREE + (servo_motor_position_degree * SERVO_MOTOR_PULSEWIDTH_MICROSECOND_PER_DEGREE);
+}
+
 // This function can be deleted
 // This was for testing and check purposes
 void temp_test(){
-	
+	for(int n = 0; n < 3; n++){
+		for(int i = 0; i <= 18; i++){
+			servo_motor_position_degree_set(i * 10);
+			wait(0.5);
+		}
+	}
+
 }
 
 int main(){
-	ALWAYS_HIGH.write(1);
 	led_line_initialize();
 	hopper_ticker_enable();
 	clicker_interrupt_enable();
+
+	servo_motor_initialize();
+
+	
 
 	temp_test();
 
