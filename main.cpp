@@ -35,13 +35,23 @@ const float CLICKER_COOLDOWN = 2; // in seconds
 DigitalOut clicker_led(P0_15, 1);
 InterruptIn clicker_interrupt(P0_16); // this will be connected to button
 
+// servo_line will use HiTec HS-311 servo motor
 // HiTEC HS-311 servo motor
 // https://hitecrcd.com/products/servos/analog/sport-2/hs-311/product
-PwmOut servo_motor_pwm_out(P2_0);
-int servo_motor_position_degree = 0;
-const float SERVO_MOTOR_DEFAULT_PERIOD_SECOND = 0.020;
-const float SERVO_MOTOR_PULSEWIDTH_MICROSECOND_AT_ZERO_DEGREE = 600;
-const float SERVO_MOTOR_PULSEWIDTH_MICROSECOND_PER_DEGREE = 10;
+const float HS_311_PWM_PERIOD_SECOND = 0.020;
+const float HS_311_PWM_PULSEWIDTH_MICROSECOND_AT_ZERO_DEGREE = 600;
+const float HS_311_PWM_PULSEWIDTH_MICROSECOND_PER_DEGREE = 10;
+
+const int SERVO_LINE_ARRAY_SIZE = 4;
+const PinName SERVO_LINE_PIN_NAME_ARRAY[SERVO_LINE_ARRAY_SIZE] = {
+	P2_0,
+	P2_1,
+	P2_2,
+	P2_3
+};
+std::vector<PwmOut> servo_line_pwm_out_vector;
+
+
 
 
 // Defining functions
@@ -66,9 +76,12 @@ float clicker_cooldown_get();
 void _clicker_interrupt_routine_begin();
 void _clicker_interrupt_routine_end();
 
-void servo_motor_initialize();
-void servo_motor_position_degree_set(int);
-int _servo_motor_pulsewidth_us_get_from_position_degree();
+float HS_311_pwm_period_second_get();
+int HS_311_pwm_pulsewidth_us_get_from_position_degree(int);
+
+void servo_line_initialize();
+void servo_line_position_degree_set(int index, int degree);
+
 
 
 
@@ -90,6 +103,7 @@ void led_line_hop(){
 void led_line_toggle_current_led(){
 	led_line_digital_out_vector.at(led_line_current_index) = !led_line_digital_out_vector.at(led_line_current_index);
 }
+
 
 // Functions for hopper
 void hopper_ticker_routine(){
@@ -164,32 +178,37 @@ void _clicker_interrupt_routine_end(){
 }
 
 
-// Servo motor functions
-void servo_motor_initialize(){
-	servo_motor_pwm_out.period(SERVO_MOTOR_DEFAULT_PERIOD_SECOND);
-	servo_motor_position_degree_set(0);
+// HS_311 servo motor functions
+float HS_311_pwm_period_second_get(){
+	return HS_311_PWM_PERIOD_SECOND;
 }
 
-void servo_motor_position_degree_set(int degree){
-	servo_motor_position_degree = degree;
-	int pulsewidth_us = _servo_motor_pulsewidth_us_get_from_position_degree();
-	servo_motor_pwm_out.pulsewidth_us(pulsewidth_us);
+int HS_311_pwm_pulsewidth_us_get_from_position_degree(int degree){
+	return HS_311_PWM_PULSEWIDTH_MICROSECOND_AT_ZERO_DEGREE + (degree * HS_311_PWM_PULSEWIDTH_MICROSECOND_PER_DEGREE);
 }
 
-int _servo_motor_pulsewidth_us_get_from_position_degree(){
-	return SERVO_MOTOR_PULSEWIDTH_MICROSECOND_AT_ZERO_DEGREE + (servo_motor_position_degree * SERVO_MOTOR_PULSEWIDTH_MICROSECOND_PER_DEGREE);
+
+// servo_line (which use HS_311 servo motor) functions
+void servo_line_initialize(){
+	for(int i = 0; i < SERVO_LINE_ARRAY_SIZE; i++){
+		servo_line_pwm_out_vector.push_back(PwmOut(SERVO_LINE_PIN_NAME_ARRAY[i]));
+		servo_line_pwm_out_vector.at(i).period(HS_311_pwm_period_second_get());
+	}
 }
+
+void servo_line_position_degree_set(int index, int degree){
+	int pulsewidth_us_for_pwm_out = HS_311_pwm_pulsewidth_us_get_from_position_degree(degree);
+	servo_line_pwm_out_vector.at(index).pulsewidth_us(pulsewidth_us_for_pwm_out);
+}
+
 
 // This function can be deleted
 // This was for testing and check purposes
 void temp_test(){
-	for(int n = 0; n < 3; n++){
-		for(int i = 0; i < 10; i++){
-			servo_motor_position_degree_set(i * 20);
-			wait(1);
-		}
-	}
-
+	servo_line_position_degree_set(0, 20);
+	servo_line_position_degree_set(1, 40);
+	servo_line_position_degree_set(2, 60);
+	servo_line_position_degree_set(3, 80);
 }
 
 int main(){
@@ -197,7 +216,7 @@ int main(){
 	hopper_ticker_enable();
 	clicker_interrupt_enable();
 
-	servo_motor_initialize();
+	servo_line_initialize();
 
 	
 
