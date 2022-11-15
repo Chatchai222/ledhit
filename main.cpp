@@ -184,9 +184,9 @@ int _servo_motor_pulsewidth_us_get_from_position_degree(){
 // This was for testing and check purposes
 void temp_test(){
 	for(int n = 0; n < 3; n++){
-		for(int i = 0; i <= 18; i++){
-			servo_motor_position_degree_set(i * 10);
-			wait(0.5);
+		for(int i = 0; i < 10; i++){
+			servo_motor_position_degree_set(i * 20);
+			wait(1);
 		}
 	}
 
