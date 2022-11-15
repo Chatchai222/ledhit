@@ -57,7 +57,8 @@ std::vector<PwmOut> servo_line_pwm_out_vector;
 // Defining functions
 void led_line_initialize();
 void led_line_hop();
-void led_line_toggle_current_led();
+void led_line_current_led_toggle();
+int led_line_current_led_index_get();
 
 void hopper_ticker_routine();
 void hopper_ticker_enable();
@@ -100,8 +101,12 @@ void led_line_hop(){
 	led_line_digital_out_vector.at(led_line_current_index).write(1);
 }
 
-void led_line_toggle_current_led(){
+void led_line_current_led_toggle(){
 	led_line_digital_out_vector.at(led_line_current_index) = !led_line_digital_out_vector.at(led_line_current_index);
+}
+
+void led_line_current_led_index_get(){
+	return led_line_current_index;
 }
 
 
@@ -125,7 +130,7 @@ void hopper_delay_set(float second){
 
 // Function for blinker 
 void blinker_ticker_routine(){
-	led_line_toggle_current_led();
+	led_line_current_led_toggle();
 }
 
 void blinker_ticker_enable(){
