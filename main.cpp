@@ -56,6 +56,9 @@ const PinName SERVO_LINE_PIN_NAME_ARRAY[SERVO_LINE_ARRAY_SIZE] = {
 };
 std::vector<PwmOut> servo_line_pwm_out_vector;
 
+// stud for display; since display is more of an interface
+
+
 
 
 
@@ -89,6 +92,8 @@ int HS_311_pwm_pulsewidth_us_get_from_position_degree(int);
 
 void servo_line_initialize();
 void servo_line_position_degree_set(int index, int degree);
+
+void display_update();
 
 void temp_test();
 
@@ -220,6 +225,13 @@ void servo_line_position_degree_set(int index, int degree){
 	int pulsewidth_us_for_pwm_out = HS_311_pwm_pulsewidth_us_get_from_position_degree(degree);
 	servo_line_pwm_out_vector.at(index).pulsewidth_us(pulsewidth_us_for_pwm_out);
 }
+
+
+// Display interface function
+void display_update(){
+	;//stud
+}
+
 
 
 // This function can be deleted
