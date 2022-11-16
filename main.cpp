@@ -115,11 +115,13 @@ void _servo_display_update_remaining_time();
 
 void display_update();
 
-void game_display_update();
+void game_update();
+void _game_display_update();
+void _game_current_score_update();
 int game_current_score_get();
 int game_current_remaining_time_get();
 int game_current_stage_get();
-void game_current_score_add(int in_score);
+void _game_current_score_add(int in_score);
 
 void temp_test();
 
@@ -220,7 +222,7 @@ void _clicker_interrupt_routine_begin(){
 	clicker_led.write(0);
 
 	temp_test();
-	display_update();
+	game_update();
 
 
 }
@@ -306,8 +308,25 @@ void display_update(){
 
 
 // Function for game (state)
-void game_display_update(){
+void game_update(){
+	_game_current_score_update();
+	_game_display_update();
+}
+
+void _game_display_update(){
 	display_update();
+}
+
+void _game_current_score_update(){
+	int score_to_add = score_mapper_score_get();
+	_game_current_score_add(score_to_add);
+}
+
+void _game_current_score_add(int in_score){
+	game_current_score += in_score;
+	if(game_current_score < 0){
+		game_current_score = 0;
+	}
 }
 
 int game_current_score_get(){
@@ -322,9 +341,7 @@ int game_current_stage_get(){
 	return game_current_stage;
 }
 
-void game_current_score_add(int in_score){
-	game_current_score += in_score;
-}
+
 
 
 
