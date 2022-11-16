@@ -44,6 +44,7 @@ InterruptIn clicker_interrupt(P0_16); // this will be connected to button
 // HiTEC HS-311 servo motor
 // https://hitecrcd.com/products/servos/analog/sport-2/hs-311/product
 const float HS_311_PWM_PERIOD_SECOND = 0.020;
+const int HS_311_MAX_DEGREE = 180;
 const float HS_311_PWM_PULSEWIDTH_MICROSECOND_AT_ZERO_DEGREE = 600;
 const float HS_311_PWM_PULSEWIDTH_MICROSECOND_PER_DEGREE = 10;
 
@@ -107,6 +108,7 @@ void _clicker_interrupt_routine_end();
 
 float HS_311_pwm_period_second_get();
 int HS_311_pwm_pulsewidth_us_get_from_position_degree(int);
+int HS_311_max_degree_get();
 
 void servo_line_initialize();
 void servo_line_position_degree_set(int index, int degree);
@@ -252,6 +254,10 @@ float HS_311_pwm_period_second_get(){
 
 int HS_311_pwm_pulsewidth_us_get_from_position_degree(int degree){
 	return HS_311_PWM_PULSEWIDTH_MICROSECOND_AT_ZERO_DEGREE + (degree * HS_311_PWM_PULSEWIDTH_MICROSECOND_PER_DEGREE);
+}
+
+int HS_311_max_degree_get(){
+	return HS_311_MAX_DEGREE;
 }
 
 
