@@ -73,6 +73,8 @@ int game_stage = GAME_STAGE_IDLE;
 Ticker game_round_time_ticker;
 const float GAME_ROUND_TIME_TICKER_DELAY = 1;
 Timeout game_game_over_timeout;
+Ticker game_display_updater_ticker;
+const float GAME_DISPLAY_UPDATER_TICKER_DELAY = 0.2;
 
 
 
@@ -127,6 +129,9 @@ void _game_round_time_ticker_disable();
 void _game_round_time_ticker_routine();
 void _game_round_time_decrement();
 void _game_game_over_timeout_routine();
+void _game_display_updater_ticker_enable();
+void _game_display_updater_ticker_disable();
+void _game_display_updater_ticker_routine();
 
 void temp_test();
 
@@ -229,8 +234,6 @@ void _clicker_interrupt_routine_begin(){
 
 	temp_test();
 	game_add_score_from_score_mapper();
-	game_display_update();
-
 
 }
 
@@ -317,7 +320,7 @@ void game_start(){
 		game_score = GAME_INITIAL_SCORE;
 		game_round_time = GAME_TIME_PER_ROUND_SECOND;
 		_game_round_time_ticker_enable();
-		game_display_update();
+		_game_display_updater_ticker_enable();
 	}
 }
 
@@ -368,6 +371,17 @@ void _game_game_over_timeout_routine(){
 
 }
 
+void _game_display_updater_ticker_enable(){
+	game_display_updater_ticker.attach(_game_display_updater_ticker_routine, GAME_DISPLAY_UPDATER_TICKER_DELAY);
+}
+
+void _game_display_updater_ticker_disable(){
+	game_display_updater_ticker.detach();
+}
+
+void _game_display_updater_ticker_routine(){
+	game_display_update();
+}
 
 
 
@@ -383,6 +397,8 @@ int main(){
 	clicker_interrupt_enable();
 
 	servo_line_initialize();
+
+	game_start();
 
 	
 
