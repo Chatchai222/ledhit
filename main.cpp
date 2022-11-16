@@ -217,8 +217,12 @@ void _clicker_interrupt_routine_begin(){
 	clicker_interrupt_disable();
 	hopper_ticker_disable();
 	blinker_ticker_enable();
-	temp_test(); // SHALL BE TAKEN OUT ONCE TESTING IS OVER
 	clicker_led.write(0);
+
+	temp_test();
+	display_update();
+
+
 }
 
 void _clicker_interrupt_routine_end(){
@@ -327,7 +331,7 @@ void game_current_score_add(int in_score){
 // This function can be deleted
 // This was for testing and check purpose
 void temp_test(){
-	display_update();//
+	
 }
 
 int main(){
