@@ -56,6 +56,11 @@ const PinName SERVO_LINE_PIN_NAME_ARRAY[SERVO_LINE_ARRAY_SIZE] = {
 };
 std::vector<PwmOut> servo_line_pwm_out_vector;
 
+const int SERVO_DISPLAY_GAME_STAGE_SERVO_LINE_INDEX = 0;
+const int SERVO_DISPLAY_SCORE_TENS_DIGIT_SERVO_LINE_INDEX = 1;
+const int SERVO_DISPLAY_SCORE_ONES_DIGIT_SERVO_LINE_INDEX = 2;
+const int SERVO_DISPLAY_REMAINING_TIME_SERVO_LINE_INDEX = 3;
+
 // stud for display; since display is more of an interface
 
 
@@ -92,6 +97,13 @@ int HS_311_pwm_pulsewidth_us_get_from_position_degree(int);
 
 void servo_line_initialize();
 void servo_line_position_degree_set(int index, int degree);
+
+void servo_display_update();
+void _servo_display_update_game_stage();
+void _servo_display_update_score();
+void _servo_display_update_score_tens_digit(int);
+void _servo_display_update_score_ones_digit(int);
+void _servo_display_update_remaining_time();
 
 void display_update();
 
@@ -226,6 +238,33 @@ void servo_line_position_degree_set(int index, int degree){
 	servo_line_pwm_out_vector.at(index).pulsewidth_us(pulsewidth_us_for_pwm_out);
 }
 
+
+// Function servo_display (which is a concrete implementation of display)
+void servo_display_update(){
+	_servo_display_update_game_stage();
+	_servo_display_update_score();
+	_servo_display_update_remaining_time();
+}
+
+void _servo_display_update_game_stage(){
+	
+}
+
+void _servo_display_update_score(){
+
+}
+
+void _servo_display_update_score_tens_digit(int){
+
+}
+
+void _servo_display_update_score_ones_digit(int){
+
+}
+
+void _servo_display_update_remaining_time(){
+	
+}
 
 // Display interface function
 void display_update(){
