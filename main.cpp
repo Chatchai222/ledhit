@@ -217,7 +217,7 @@ void _clicker_interrupt_routine_begin(){
 	clicker_interrupt_disable();
 	hopper_ticker_disable();
 	blinker_ticker_enable();
-	temp_test();
+	temp_test(); // SHALL BE TAKEN OUT ONCE TESTING IS OVER
 	clicker_led.write(0);
 }
 
@@ -261,28 +261,43 @@ void servo_display_update(){
 }
 
 void _servo_display_update_game_stage(){
-	
+	int game_stage = game_current_stage_get();
+	servo_line_position_degree_set(SERVO_DISPLAY_GAME_STAGE_SERVO_LINE_INDEX, game_stage * 90);
 }
 
 void _servo_display_update_score(){
-
+	int game_score = game_current_score_get();
+	int tens_digit_score = 0;
+	int ones_digit_score = 0;
+	if(game_score < 0){
+		game_score = 0;
+	}
+	if(game_score > 99){
+		game_score = 99;
+	}
+	tens_digit_score = floor(game_score / 10);
+	ones_digit_score = game_score % 10;
+	_servo_display_update_score_tens_digit(tens_digit_score);
+	_servo_display_update_score_ones_digit(ones_digit_score);
 }
 
-void _servo_display_update_score_tens_digit(int){
-
+void _servo_display_update_score_tens_digit(int in_score){
+	servo_line_position_degree_set(SERVO_DISPLAY_SCORE_TENS_DIGIT_SERVO_LINE_INDEX, in_score * 20);
 }
 
-void _servo_display_update_score_ones_digit(int){
-
+void _servo_display_update_score_ones_digit(int in_score){
+	servo_line_position_degree_set(SERVO_DISPLAY_SCORE_ONES_DIGIT_SERVO_LINE_INDEX, in_score * 20);
 }
 
 void _servo_display_update_remaining_time(){
-	
+	int remaining_time = game_current_remaining_time_get();
+	servo_line_position_degree_set(SERVO_DISPLAY_REMAINING_TIME_SERVO_LINE_INDEX, remaining_time * 6);
 }
+
 
 // Display interface function
 void display_update(){
-	;//stud
+	servo_display_update();
 }
 
 
@@ -310,13 +325,9 @@ void game_current_score_add(int in_score){
 
 
 // This function can be deleted
-// This was for testing and check purposes
+// This was for testing and check purpose
 void temp_test(){
-	int score = score_mapper_score_get();
-	servo_line_position_degree_set(0, score * 20);
-	servo_line_position_degree_set(1, score * 20);
-	servo_line_position_degree_set(2, score * 20);
-	servo_line_position_degree_set(3, score * 20);
+	display_update();//
 }
 
 int main(){
