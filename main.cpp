@@ -67,11 +67,11 @@ const int GAME_TIME_PER_ROUND_SECOND = 30;
 const int GAME_INITIAL_SCORE = 0;
 const int GAME_STAGE_IDLE = 0;
 const int GAME_STAGE_PLAYING = 1;
-int game_current_score = GAME_INITIAL_SCORE;
-int game_current_round_time = GAME_TIME_PER_ROUND_SECOND;
+int game_score = GAME_INITIAL_SCORE;
+int game_round_time = GAME_TIME_PER_ROUND_SECOND;
 int game_current_stage = GAME_STAGE_IDLE;
-Ticker game_current_round_time_ticker;
-const float GAME_CURRENT_ROUND_TIME_TICKER_DELAY = 1;
+Ticker game_round_time_ticker;
+const float GAME_ROUND_TIME_TICKER_DELAY = 1;
 Timeout game_game_over_timeout;
 
 
@@ -120,12 +120,12 @@ void display_update();
 
 void game_update();
 void _game_display_update();
-void _game_current_score_update();
-void _game_current_score_add(int in_score);
+void _game_score_update();
+void _game_score_add(int in_score);
 void _game_round_time_update();
-int game_current_score_get();
-int game_current_round_time_get();
-int game_current_stage_get();
+int game_score_get();
+int game_round_time_get();
+int game_stage_get();
 void _game_round_time_ticker_enable();
 void _game_round_time_ticker_disable();
 void _game_round_time_ticker_routine();
@@ -276,12 +276,12 @@ void servo_display_update(){
 }
 
 void _servo_display_update_game_stage(){
-	int game_stage = game_current_stage_get();
+	int game_stage = game_stage_get();
 	servo_line_position_degree_set(SERVO_DISPLAY_GAME_STAGE_SERVO_LINE_INDEX, game_stage * 90);
 }
 
 void _servo_display_update_score(){
-	int game_score = game_current_score_get();
+	int game_score = game_score_get();
 	int tens_digit_score = 0;
 	int ones_digit_score = 0;
 	if(game_score < 0){
@@ -305,7 +305,7 @@ void _servo_display_update_score_ones_digit(int in_score){
 }
 
 void _servo_display_update_round_time(){
-	int round_time = game_current_round_time_get();
+	int round_time = game_round_time_get();
 	servo_line_position_degree_set(SERVO_DISPLAY_ROUND_TIME_SERVO_LINE_INDEX, round_time * 6);
 }
 
@@ -318,7 +318,7 @@ void display_update(){
 
 // Function for game (state)
 void game_update(){
-	_game_current_score_update();
+	_game_score_update();
 	_game_display_update();
 }
 
@@ -326,27 +326,27 @@ void _game_display_update(){
 	display_update();
 }
 
-void _game_current_score_update(){
+void _game_score_update(){
 	int score_to_add = score_mapper_score_get();
-	_game_current_score_add(score_to_add);
+	_game_score_add(score_to_add);
 }
 
-void _game_current_score_add(int in_score){
-	game_current_score += in_score;
-	if(game_current_score < 0){
-		game_current_score = 0;
+void _game_score_add(int in_score){
+	game_score += in_score;
+	if(game_score < 0){
+		game_score = 0;
 	}
 }
 
-int game_current_score_get(){
-	return game_current_score;
+int game_score_get(){
+	return game_score;
 }
 
-int game_current_round_time_get(){
-	return game_current_round_time;
+int game_round_time_get(){
+	return game_round_time;
 }
 
-int game_current_stage_get(){
+int game_stage_get(){
 	return game_current_stage;
 }
 
