@@ -59,7 +59,7 @@ std::vector<PwmOut> servo_line_pwm_out_vector;
 const int SERVO_DISPLAY_GAME_STAGE_SERVO_LINE_INDEX = 0;
 const int SERVO_DISPLAY_SCORE_TENS_DIGIT_SERVO_LINE_INDEX = 1;
 const int SERVO_DISPLAY_SCORE_ONES_DIGIT_SERVO_LINE_INDEX = 2;
-const int SERVO_DISPLAY_REMAINING_TIME_SERVO_LINE_INDEX = 3;
+const int SERVO_DISPLAY_ROUND_TIME_SERVO_LINE_INDEX = 3;
 
 // stud for display; since display is more of an interface
 
@@ -68,8 +68,11 @@ const int GAME_INITIAL_SCORE = 0;
 const int GAME_STAGE_IDLE = 0;
 const int GAME_STAGE_PLAYING = 1;
 int game_current_score = GAME_INITIAL_SCORE;
-int game_current_remaining_time = GAME_TIME_PER_ROUND_SECOND;
+int game_current_round_time = GAME_TIME_PER_ROUND_SECOND;
 int game_current_stage = GAME_STAGE_IDLE;
+Ticker game_current_round_time_ticker;
+const float GAME_CURRENT_ROUND_TIME_TICKER_DELAY = 1;
+Timeout game_game_over_timeout;
 
 
 
@@ -111,19 +114,25 @@ void _servo_display_update_game_stage();
 void _servo_display_update_score();
 void _servo_display_update_score_tens_digit(int);
 void _servo_display_update_score_ones_digit(int);
-void _servo_display_update_remaining_time();
+void _servo_display_update_round_time();
 
 void display_update();
 
 void game_update();
 void _game_display_update();
 void _game_current_score_update();
-int game_current_score_get();
-int game_current_remaining_time_get();
-int game_current_stage_get();
 void _game_current_score_add(int in_score);
+void _game_round_time_update();
+int game_current_score_get();
+int game_current_round_time_get();
+int game_current_stage_get();
+void _game_round_time_ticker_enable();
+void _game_round_time_ticker_disable();
+void _game_round_time_ticker_routine();
+void _game_game_over_timeout_routine();
 
 void temp_test();
+
 
 
 
@@ -263,7 +272,7 @@ void servo_line_position_degree_set(int index, int degree){
 void servo_display_update(){
 	_servo_display_update_game_stage();
 	_servo_display_update_score();
-	_servo_display_update_remaining_time();
+	_servo_display_update_round_time();
 }
 
 void _servo_display_update_game_stage(){
@@ -295,9 +304,9 @@ void _servo_display_update_score_ones_digit(int in_score){
 	servo_line_position_degree_set(SERVO_DISPLAY_SCORE_ONES_DIGIT_SERVO_LINE_INDEX, in_score * 20);
 }
 
-void _servo_display_update_remaining_time(){
-	int remaining_time = game_current_remaining_time_get();
-	servo_line_position_degree_set(SERVO_DISPLAY_REMAINING_TIME_SERVO_LINE_INDEX, remaining_time * 6);
+void _servo_display_update_round_time(){
+	int round_time = game_current_round_time_get();
+	servo_line_position_degree_set(SERVO_DISPLAY_ROUND_TIME_SERVO_LINE_INDEX, round_time * 6);
 }
 
 
@@ -333,14 +342,29 @@ int game_current_score_get(){
 	return game_current_score;
 }
 
-int game_current_remaining_time_get(){
-	return game_current_remaining_time;
+int game_current_round_time_get(){
+	return game_current_round_time;
 }
 
 int game_current_stage_get(){
 	return game_current_stage;
 }
 
+void _game_round_time_ticker_enable(){
+
+}
+
+void _game_round_time_ticker_disable(){
+
+}
+
+void _game_round_time_ticker_routine(){
+
+}
+
+void _game_game_over_timeout_routine(){
+
+}
 
 
 
