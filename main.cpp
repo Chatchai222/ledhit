@@ -63,6 +63,14 @@ const int SERVO_DISPLAY_REMAINING_TIME_SERVO_LINE_INDEX = 3;
 
 // stud for display; since display is more of an interface
 
+const int GAME_TIME_PER_ROUND_SECOND = 30;
+const int GAME_INITIAL_SCORE = 0;
+const int GAME_STAGE_IDLE = 0;
+const int GAME_STAGE_PLAYING = 1;
+int game_current_score = GAME_INITIAL_SCORE;
+int game_current_remaining_time = GAME_TIME_PER_ROUND_SECOND;
+int game_current_stage = GAME_STAGE_IDLE;
+
 
 
 
@@ -106,6 +114,12 @@ void _servo_display_update_score_ones_digit(int);
 void _servo_display_update_remaining_time();
 
 void display_update();
+
+void game_display_update();
+int game_current_score_get();
+int game_current_remaining_time_get();
+int game_current_stage_get();
+void game_current_score_add(int in_score);
 
 void temp_test();
 
@@ -269,6 +283,28 @@ void _servo_display_update_remaining_time(){
 // Display interface function
 void display_update(){
 	;//stud
+}
+
+
+// Function for game (state)
+void game_display_update(){
+	display_update();
+}
+
+int game_current_score_get(){
+	return game_current_score;
+}
+
+int game_current_remaining_time_get(){
+	return game_current_remaining_time;
+}
+
+int game_current_stage_get(){
+	return game_current_stage;
+}
+
+void game_current_score_add(int in_score){
+	game_current_score += in_score;
 }
 
 
