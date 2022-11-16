@@ -69,7 +69,7 @@ const int GAME_STAGE_IDLE = 0;
 const int GAME_STAGE_PLAYING = 1;
 int game_score = GAME_INITIAL_SCORE;
 int game_round_time = GAME_TIME_PER_ROUND_SECOND;
-int game_current_stage = GAME_STAGE_IDLE;
+int game_stage = GAME_STAGE_IDLE;
 Ticker game_round_time_ticker;
 const float GAME_ROUND_TIME_TICKER_DELAY = 1;
 Timeout game_game_over_timeout;
@@ -116,19 +116,16 @@ void _servo_display_update_score_tens_digit(int);
 void _servo_display_update_score_ones_digit(int);
 void _servo_display_update_round_time();
 
-void display_update();
-
-void game_update();
-void _game_display_update();
-void _game_score_update();
-void _game_score_add(int in_score);
-void _game_round_time_update();
+void game_start();
+void game_display_update();
+void game_add_score_from_score_mapper();
 int game_score_get();
 int game_round_time_get();
 int game_stage_get();
 void _game_round_time_ticker_enable();
 void _game_round_time_ticker_disable();
 void _game_round_time_ticker_routine();
+void _game_round_time_decrement();
 void _game_game_over_timeout_routine();
 
 void temp_test();
@@ -231,7 +228,8 @@ void _clicker_interrupt_routine_begin(){
 	clicker_led.write(0);
 
 	temp_test();
-	game_update();
+	game_add_score_from_score_mapper();
+	game_display_update();
 
 
 }
@@ -310,29 +308,26 @@ void _servo_display_update_round_time(){
 }
 
 
-// Display interface function
-void display_update(){
+// Function for game (state)
+void game_start(){
+	if(game_stage == GAME_STAGE_PLAYING){
+		return;
+	} else {
+		game_stage = GAME_STAGE_IDLE;
+		game_score = GAME_INITIAL_SCORE;
+		game_round_time = GAME_TIME_PER_ROUND_SECOND;
+		_game_round_time_ticker_enable();
+		game_display_update();
+	}
+}
+
+void game_display_update(){
 	servo_display_update();
 }
 
-
-// Function for game (state)
-void game_update(){
-	_game_score_update();
-	_game_display_update();
-}
-
-void _game_display_update(){
-	display_update();
-}
-
-void _game_score_update(){
+void game_add_score_from_score_mapper(){
 	int score_to_add = score_mapper_score_get();
-	_game_score_add(score_to_add);
-}
-
-void _game_score_add(int in_score){
-	game_score += in_score;
+	game_score += score_to_add;
 	if(game_score < 0){
 		game_score = 0;
 	}
@@ -347,19 +342,26 @@ int game_round_time_get(){
 }
 
 int game_stage_get(){
-	return game_current_stage;
+	return game_stage;
 }
 
 void _game_round_time_ticker_enable(){
-
+	game_round_time_ticker.attach(_game_round_time_ticker_routine, GAME_ROUND_TIME_TICKER_DELAY);
 }
 
 void _game_round_time_ticker_disable(){
-
+	game_round_time_ticker.detach();
 }
 
 void _game_round_time_ticker_routine(){
+	_game_round_time_decrement();
+}
 
+void _game_round_time_decrement(){
+	game_round_time--;
+	if(game_round_time < 0){
+		game_round_time = 0;
+	}
 }
 
 void _game_game_over_timeout_routine(){
