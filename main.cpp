@@ -30,6 +30,11 @@ float hopper_delay = 0.2;
 Ticker blinker_ticker;
 const int BLINKER_BLINK_AMOUNT = 6;
 
+const int SCORE_MAPPER_ARRAY_SIZE = 7;
+const int SCORE_MAPPER_SCORE_ARRAY[SCORE_MAPPER_ARRAY_SIZE] = {
+	0, 1, 2, 3, 4, 5, 6
+};
+
 Timeout clicker_timeout;
 const float CLICKER_COOLDOWN = 2; // in seconds
 DigitalOut clicker_led(P0_15, 1);
@@ -70,6 +75,8 @@ void blinker_ticker_enable();
 void blinker_ticker_disable();
 float _blinker_blink_delay_get();
 
+int score_mapper_score_get();
+
 void clicker_interrupt_enable();
 void clicker_interrupt_disable();
 void clicker_interrupt_routine();
@@ -83,7 +90,7 @@ int HS_311_pwm_pulsewidth_us_get_from_position_degree(int);
 void servo_line_initialize();
 void servo_line_position_degree_set(int index, int degree);
 
-
+void temp_test();
 
 
 
@@ -105,7 +112,7 @@ void led_line_current_led_toggle(){
 	led_line_digital_out_vector.at(led_line_current_index) = !led_line_digital_out_vector.at(led_line_current_index);
 }
 
-void led_line_current_led_index_get(){
+int led_line_current_led_index_get(){
 	return led_line_current_index;
 }
 
@@ -149,6 +156,13 @@ float _blinker_blink_delay_get(){
 }
 
 
+// Function for score mapper
+int score_mapper_score_get(){
+	int index_to_map_to_score = led_line_current_led_index_get();
+	return SCORE_MAPPER_SCORE_ARRAY[index_to_map_to_score];
+}
+
+
 // Function for clicker
 void clicker_interrupt_enable(){
 	clicker_interrupt.enable_irq();
@@ -172,6 +186,7 @@ void _clicker_interrupt_routine_begin(){
 	clicker_interrupt_disable();
 	hopper_ticker_disable();
 	blinker_ticker_enable();
+	temp_test();
 	clicker_led.write(0);
 }
 
@@ -210,10 +225,11 @@ void servo_line_position_degree_set(int index, int degree){
 // This function can be deleted
 // This was for testing and check purposes
 void temp_test(){
-	servo_line_position_degree_set(0, 20);
-	servo_line_position_degree_set(1, 40);
-	servo_line_position_degree_set(2, 60);
-	servo_line_position_degree_set(3, 80);
+	int score = score_mapper_score_get();
+	servo_line_position_degree_set(0, score * 20);
+	servo_line_position_degree_set(1, score * 20);
+	servo_line_position_degree_set(2, score * 20);
+	servo_line_position_degree_set(3, score * 20);
 }
 
 int main(){
