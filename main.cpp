@@ -127,6 +127,7 @@ void _servo_display_update_round_time();
 
 void game_start();
 void game_display_update();
+void game_difficulty_update();
 void game_add_score_from_score_mapper();
 int game_score_get();
 int game_round_time_get();
@@ -366,6 +367,10 @@ void game_start(){
 
 void game_display_update(){
 	servo_display_update();
+}
+
+void game_difficulty_update(){
+	difficulty_setter_update();
 }
 
 void game_add_score_from_score_mapper(){
