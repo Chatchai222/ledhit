@@ -314,7 +314,8 @@ void servo_display_update(){
 
 void _servo_display_update_game_stage(){
 	int game_stage = game_stage_get();
-	servo_line_position_degree_set(SERVO_DISPLAY_GAME_STAGE_SERVO_LINE_INDEX, game_stage * 90);
+	int position_percent = game_stage * 0.2;
+	servo_line_position_percent_set(SERVO_DISPLAY_GAME_STAGE_SERVO_LINE_INDEX, position_percent);
 }
 
 void _servo_display_update_score(){
@@ -334,16 +335,20 @@ void _servo_display_update_score(){
 }
 
 void _servo_display_update_score_tens_digit(int in_score){
-	servo_line_position_degree_set(SERVO_DISPLAY_SCORE_TENS_DIGIT_SERVO_LINE_INDEX, in_score * 20);
+	float position_percent = in_score / 10.0;
+	servo_line_position_percent_set(SERVO_DISPLAY_SCORE_TENS_DIGIT_SERVO_LINE_INDEX, position_percent);
 }
 
 void _servo_display_update_score_ones_digit(int in_score){
-	servo_line_position_degree_set(SERVO_DISPLAY_SCORE_ONES_DIGIT_SERVO_LINE_INDEX, in_score * 20);
+	float position_percent = in_score / 10.0;
+	servo_line_position_percent_set(SERVO_DISPLAY_SCORE_ONES_DIGIT_SERVO_LINE_INDEX, position_percent);
 }
 
 void _servo_display_update_round_time(){
 	int round_time = game_round_time_get();
-	servo_line_position_degree_set(SERVO_DISPLAY_ROUND_TIME_SERVO_LINE_INDEX, round_time * 6);
+	int initial_round_time = game_initial_round_time_get();
+	float position_percent = round_time / (initial_round_time * 1.0); // the "* 1.0" prevent integer arithmetic 5/2 = 2, 5/(2 * 1.0) = 2.5;
+	servo_line_position_percent_set(SERVO_DISPLAY_ROUND_TIME_SERVO_LINE_INDEX, position_percent);
 }
 
 
@@ -454,7 +459,8 @@ void _round_starter_interrupt_routine_end(){
 // This was for testing and check purpose
 void temp_test(){
 	int score = score_mapper_score_get();
-	servo_line_position_percent_set(0, score * 0.1);
+	_servo_display_update_score_ones_digit(score);
+	_servo_display_update_score_tens_digit(score);
 }
 
 int main(){
