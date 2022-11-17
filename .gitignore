@@ -3,4 +3,5 @@
 !.gitignore
 Debug/app_lcd.axf
 Debug/app_lcd.bin
+Debug/app_lcd.map
 Debug/main.o
