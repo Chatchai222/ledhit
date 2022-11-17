@@ -148,6 +148,7 @@ void round_starter_interrupt_routine();
 void _round_starter_interrupt_routine_begin();
 void _round_starter_interrupt_routine_end();
 
+void difficulty_setter_update();
 
 void temp_test();
 
@@ -467,6 +468,11 @@ void _round_starter_interrupt_routine_end(){
 	round_starter_led.write(1);
 }
 
+
+// Function for difficulty_stter
+void difficulty_setter_update(){
+	
+}
 
 // This function can be deleted
 // This was for testing and check purpose
