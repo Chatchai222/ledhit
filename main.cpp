@@ -10,6 +10,7 @@ https://www.betsonparts.com/media/hbi/service-manuals/355/Cyclone%20Service%20Ma
 
 // Defining macros and definitions
 DigitalOut ALWAYS_HIGH(P2_13, 1);
+DigitalOut BOARD_LED2(P0_22);
 
 const int LED_LINE_ARRAY_SIZE = 7;
 std::vector<DigitalOut> led_line_digital_out_vector;
@@ -76,7 +77,9 @@ Timeout game_game_over_timeout;
 Ticker game_display_updater_ticker;
 const float GAME_DISPLAY_UPDATER_TICKER_DELAY = 0.2;
 
-
+Timeout round_starter_timeout;
+InterruptIn round_starter_interrupt(P0_2); // this will be connected to button
+DigitalOut round_starter_led(P0_3, 1);
 
 
 
@@ -124,6 +127,7 @@ void game_add_score_from_score_mapper();
 int game_score_get();
 int game_round_time_get();
 int game_stage_get();
+int game_time_per_round_get();
 void _game_round_time_ticker_enable();
 void _game_round_time_ticker_disable();
 void _game_round_time_ticker_routine();
@@ -132,6 +136,13 @@ void _game_game_over_timeout_routine();
 void _game_display_updater_ticker_enable();
 void _game_display_updater_ticker_disable();
 void _game_display_updater_ticker_routine();
+
+void round_starter_interrupt_enable();
+void round_starter_interrupt_disable();
+void round_starter_interrupt_routine();
+void _round_starter_interrupt_routine_begin();
+void _round_starter_interrupt_routine_end();
+
 
 void temp_test();
 
@@ -209,12 +220,11 @@ int score_mapper_score_get(){
 
 // Function for clicker
 void clicker_interrupt_enable(){
-	clicker_interrupt.enable_irq();
 	clicker_interrupt.rise(clicker_interrupt_routine);
 }
 
 void clicker_interrupt_disable(){
-	clicker_interrupt.disable_irq();
+	clicker_interrupt.rise(0); // when interrupt don't call anything
 }
 
 void clicker_interrupt_routine(){
@@ -348,6 +358,10 @@ int game_stage_get(){
 	return game_stage;
 }
 
+int game_time_per_round_get(){
+	return GAME_TIME_PER_ROUND_SECOND;
+}
+
 void _game_round_time_ticker_enable(){
 	game_round_time_ticker.attach(_game_round_time_ticker_routine, GAME_ROUND_TIME_TICKER_DELAY);
 }
@@ -385,6 +399,32 @@ void _game_display_updater_ticker_routine(){
 
 
 
+// Function for the round starter
+void round_starter_interrupt_enable(){
+	round_starter_interrupt.rise(round_starter_interrupt_routine);
+}
+
+void round_starter_interrupt_disable(){
+	round_starter_interrupt.rise(0); // setting to 0 means don't call anything "none"
+}
+
+void round_starter_interrupt_routine(){
+	_round_starter_interrupt_routine_begin();
+	round_starter_timeout.attach(_round_starter_interrupt_routine_end, 5);
+}
+
+void _round_starter_interrupt_routine_begin(){
+	round_starter_interrupt_disable();
+	round_starter_led.write(0);
+}
+
+void _round_starter_interrupt_routine_end(){
+	round_starter_interrupt_enable();
+	round_starter_led.write(1);
+}
+
+
+
 // This function can be deleted
 // This was for testing and check purpose
 void temp_test(){
@@ -398,16 +438,14 @@ int main(){
 
 	servo_line_initialize();
 
-	game_start();
-
+	round_starter_interrupt_enable();
 	
 
 	temp_test();
 
-	// The while loop keep the program running
-	DigitalOut board_led2(P0_22);
+	// The while loop keep the program running forever
 	while(1){
-		board_led2 = !board_led2;
-		wait(1);
+		BOARD_LED2 = !BOARD_LED2;
+		wait(3);
 	}
 }
