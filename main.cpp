@@ -10,6 +10,7 @@ https://www.betsonparts.com/media/hbi/service-manuals/355/Cyclone%20Service%20Ma
 
 // Defining macros and definitions
 DigitalOut ALWAYS_HIGH(P2_13, 1);
+DigitalOut BOARD_LED2(P0_22);
 
 const int LED_LINE_ARRAY_SIZE = 7;
 std::vector<DigitalOut> led_line_digital_out_vector;
@@ -64,12 +65,12 @@ const int SERVO_DISPLAY_ROUND_TIME_SERVO_LINE_INDEX = 3;
 
 // stud for display; since display is more of an interface
 
-const int GAME_TIME_PER_ROUND_SECOND = 30;
+const int GAME_INITIAL_ROUND_TIME = 30;
 const int GAME_INITIAL_SCORE = 0;
 const int GAME_STAGE_IDLE = 0;
 const int GAME_STAGE_PLAYING = 1;
 int game_score = GAME_INITIAL_SCORE;
-int game_round_time = GAME_TIME_PER_ROUND_SECOND;
+int game_round_time = GAME_INITIAL_ROUND_TIME;
 int game_stage = GAME_STAGE_IDLE;
 Ticker game_round_time_ticker;
 const float GAME_ROUND_TIME_TICKER_DELAY = 1;
@@ -77,7 +78,9 @@ Timeout game_game_over_timeout;
 Ticker game_display_updater_ticker;
 const float GAME_DISPLAY_UPDATER_TICKER_DELAY = 0.2;
 
-
+Timeout round_starter_timeout;
+InterruptIn round_starter_interrupt(P0_2); // this will be connected to button
+DigitalOut round_starter_led(P0_3, 1);
 
 
 
@@ -126,6 +129,7 @@ void game_add_score_from_score_mapper();
 int game_score_get();
 int game_round_time_get();
 int game_stage_get();
+int game_initial_round_time_get();
 void _game_round_time_ticker_enable();
 void _game_round_time_ticker_disable();
 void _game_round_time_ticker_routine();
@@ -134,6 +138,13 @@ void _game_game_over_timeout_routine();
 void _game_display_updater_ticker_enable();
 void _game_display_updater_ticker_disable();
 void _game_display_updater_ticker_routine();
+
+void round_starter_interrupt_enable();
+void round_starter_interrupt_disable();
+void round_starter_interrupt_routine();
+void _round_starter_interrupt_routine_begin();
+void _round_starter_interrupt_routine_end();
+
 
 void temp_test();
 
@@ -211,12 +222,11 @@ int score_mapper_score_get(){
 
 // Function for clicker
 void clicker_interrupt_enable(){
-	clicker_interrupt.enable_irq();
 	clicker_interrupt.rise(clicker_interrupt_routine);
 }
 
 void clicker_interrupt_disable(){
-	clicker_interrupt.disable_irq();
+	clicker_interrupt.rise(0); // when interrupt don't call anything
 }
 
 void clicker_interrupt_routine(){
@@ -322,9 +332,9 @@ void game_start(){
 	if(game_stage == GAME_STAGE_PLAYING){
 		return;
 	} else {
-		game_stage = GAME_STAGE_IDLE;
+		game_stage = GAME_STAGE_PLAYING;
 		game_score = GAME_INITIAL_SCORE;
-		game_round_time = GAME_TIME_PER_ROUND_SECOND;
+		game_round_time = GAME_INITIAL_ROUND_TIME;
 		_game_round_time_ticker_enable();
 		_game_display_updater_ticker_enable();
 	}
@@ -352,6 +362,10 @@ int game_round_time_get(){
 
 int game_stage_get(){
 	return game_stage;
+}
+
+int game_initial_round_time_get(){
+	return GAME_INITIAL_ROUND_TIME;
 }
 
 void _game_round_time_ticker_enable(){
@@ -391,6 +405,32 @@ void _game_display_updater_ticker_routine(){
 
 
 
+// Function for the round starter
+void round_starter_interrupt_enable(){
+	round_starter_interrupt.rise(round_starter_interrupt_routine);
+}
+
+void round_starter_interrupt_disable(){
+	round_starter_interrupt.rise(0); // setting to 0 means don't call anything "none"
+}
+
+void round_starter_interrupt_routine(){
+	_round_starter_interrupt_routine_begin();
+	round_starter_timeout.attach(_round_starter_interrupt_routine_end, game_initial_round_time_get());
+}
+
+void _round_starter_interrupt_routine_begin(){
+	round_starter_interrupt_disable();
+	round_starter_led.write(0);
+}
+
+void _round_starter_interrupt_routine_end(){
+	round_starter_interrupt_enable();
+	round_starter_led.write(1);
+}
+
+
+
 // This function can be deleted
 // This was for testing and check purpose
 void temp_test(){
@@ -404,16 +444,14 @@ int main(){
 
 	servo_line_initialize();
 
-	game_start();
-
+	round_starter_interrupt_enable();
 	
 
 	temp_test();
 
-	// The while loop keep the program running
-	DigitalOut board_led2(P0_22);
+	// The while loop keep the program running forever
 	while(1){
-		board_led2 = !board_led2;
-		wait(1);
+		BOARD_LED2 = !BOARD_LED2;
+		wait(3);
 	}
 }
