@@ -316,7 +316,7 @@ void game_start(){
 	if(game_stage == GAME_STAGE_PLAYING){
 		return;
 	} else {
-		game_stage = GAME_STAGE_IDLE;
+		game_stage = GAME_STAGE_PLAYING;
 		game_score = GAME_INITIAL_SCORE;
 		game_round_time = GAME_TIME_PER_ROUND_SECOND;
 		_game_round_time_ticker_enable();
