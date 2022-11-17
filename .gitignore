@@ -1,4 +1,6 @@
 # Ignore all file with "." as the start except .gitignore
 .*
 !.gitignore
-Debug/
+Debug/app_lcd.axf
+Debug/app_lcd.bin
+Debug/main.o
