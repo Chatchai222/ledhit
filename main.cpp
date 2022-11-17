@@ -110,7 +110,7 @@ void _clicker_interrupt_routine_begin();
 void _clicker_interrupt_routine_end();
 
 float HS_311_pwm_period_second_get();
-int HS_311_pwm_pulsewidth_us_get_from_position_degree(int);
+int HS_311_pwm_pulsewidth_microsecond_get_from_position_degree(int);
 int HS_311_max_degree_get();
 
 void servo_line_initialize();
@@ -262,7 +262,7 @@ float HS_311_pwm_period_second_get(){
 	return HS_311_PWM_PERIOD_SECOND;
 }
 
-int HS_311_pwm_pulsewidth_us_get_from_position_degree(int degree){
+int HS_311_pwm_pulsewidth_microsecond_get_from_position_degree(int degree){
 	return HS_311_PWM_PULSEWIDTH_MICROSECOND_AT_ZERO_DEGREE + (degree * HS_311_PWM_PULSEWIDTH_MICROSECOND_PER_DEGREE);
 }
 
@@ -280,7 +280,7 @@ void servo_line_initialize(){
 }
 
 void servo_line_position_degree_set(int index, int degree){
-	int pulsewidth_us_for_pwm_out = HS_311_pwm_pulsewidth_us_get_from_position_degree(degree);
+	int pulsewidth_us_for_pwm_out = HS_311_pwm_pulsewidth_microsecond_get_from_position_degree(degree);
 	servo_line_pwm_out_vector.at(index).pulsewidth_us(pulsewidth_us_for_pwm_out);
 }
 
