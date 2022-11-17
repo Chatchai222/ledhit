@@ -111,10 +111,12 @@ void _clicker_interrupt_routine_end();
 
 float HS_311_pwm_period_second_get();
 int HS_311_pwm_pulsewidth_microsecond_get_from_position_degree(int);
+int HS_311_pwm_pulsewidth_microsecond_get_from_position_percent(float);
 int HS_311_max_degree_get();
 
 void servo_line_initialize();
 void servo_line_position_degree_set(int index, int degree);
+void servo_line_position_percent_set(int index, float percent);
 
 void servo_display_update();
 void _servo_display_update_game_stage();
@@ -257,13 +259,26 @@ void _clicker_interrupt_routine_end(){
 }
 
 
-// HS_311 servo motor functions
+// HS_311 servo motor function
 float HS_311_pwm_period_second_get(){
 	return HS_311_PWM_PERIOD_SECOND;
 }
 
 int HS_311_pwm_pulsewidth_microsecond_get_from_position_degree(int degree){
 	return HS_311_PWM_PULSEWIDTH_MICROSECOND_AT_ZERO_DEGREE + (degree * HS_311_PWM_PULSEWIDTH_MICROSECOND_PER_DEGREE);
+}
+
+int HS_311_pwm_pulsewidth_microsecond_get_from_position_percent(float in_position_percentage){
+	int output;
+	float position_percentage = in_position_percentage;
+	if(position_percentage < 0){
+		position_percentage = 0;
+	}
+	if(position_percentage > 1){
+		position_percentage = 1;
+	}
+	output = (int)( HS_311_PWM_PULSEWIDTH_MICROSECOND_AT_ZERO_DEGREE + (position_percentage * HS_311_MAX_DEGREE * HS_311_PWM_PULSEWIDTH_MICROSECOND_PER_DEGREE));
+	return output;
 }
 
 int HS_311_max_degree_get(){
@@ -281,6 +296,11 @@ void servo_line_initialize(){
 
 void servo_line_position_degree_set(int index, int degree){
 	int pulsewidth_us_for_pwm_out = HS_311_pwm_pulsewidth_microsecond_get_from_position_degree(degree);
+	servo_line_pwm_out_vector.at(index).pulsewidth_us(pulsewidth_us_for_pwm_out);
+}
+
+void servo_line_position_percent_set(int index, float percent){
+	int pulsewidth_us_for_pwm_out = HS_311_pwm_pulsewidth_microsecond_get_from_position_percent(percent);
 	servo_line_pwm_out_vector.at(index).pulsewidth_us(pulsewidth_us_for_pwm_out);
 }
 
@@ -430,11 +450,11 @@ void _round_starter_interrupt_routine_end(){
 }
 
 
-
 // This function can be deleted
 // This was for testing and check purpose
 void temp_test(){
-	
+	int score = score_mapper_score_get();
+	servo_line_position_percent_set(0, score * 0.1);
 }
 
 int main(){
