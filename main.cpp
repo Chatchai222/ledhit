@@ -136,6 +136,7 @@ void _game_round_time_ticker_enable();
 void _game_round_time_ticker_disable();
 void _game_round_time_ticker_routine();
 void _game_round_time_decrement();
+void _game_game_start_routine();
 void _game_game_over_timeout_routine();
 void _game_display_updater_ticker_enable();
 void _game_display_updater_ticker_disable();
@@ -314,7 +315,7 @@ void servo_display_update(){
 
 void _servo_display_update_game_stage(){
 	int game_stage = game_stage_get();
-	int position_percent = game_stage * 0.2;
+	float position_percent = game_stage * 0.5;
 	servo_line_position_percent_set(SERVO_DISPLAY_GAME_STAGE_SERVO_LINE_INDEX, position_percent);
 }
 
@@ -357,11 +358,8 @@ void game_start(){
 	if(game_stage == GAME_STAGE_PLAYING){
 		return;
 	} else {
-		game_stage = GAME_STAGE_PLAYING;
-		game_score = GAME_INITIAL_SCORE;
-		game_round_time = GAME_INITIAL_ROUND_TIME;
-		_game_round_time_ticker_enable();
-		_game_display_updater_ticker_enable();
+		_game_game_start_routine();
+		game_game_over_timeout.attach(_game_game_over_timeout_routine, GAME_INITIAL_ROUND_TIME);
 	}
 }
 
@@ -412,8 +410,21 @@ void _game_round_time_decrement(){
 	}
 }
 
-void _game_game_over_timeout_routine(){
+void _game_game_start_routine(){
+	game_score = GAME_INITIAL_SCORE;
+	game_round_time = GAME_INITIAL_ROUND_TIME;
 
+	game_stage = GAME_STAGE_PLAYING;
+	_game_round_time_ticker_enable();
+	_game_display_updater_ticker_enable();
+}
+
+void _game_game_over_timeout_routine(){
+	game_stage = GAME_STAGE_IDLE;
+	_game_round_time_ticker_disable();
+	_game_display_updater_ticker_disable();
+
+	game_display_update(); // display to know the game stage is idle
 }
 
 void _game_display_updater_ticker_enable(){
@@ -447,6 +458,8 @@ void round_starter_interrupt_routine(){
 void _round_starter_interrupt_routine_begin(){
 	round_starter_interrupt_disable();
 	round_starter_led.write(0);
+
+	game_start();
 }
 
 void _round_starter_interrupt_routine_end(){
@@ -458,9 +471,7 @@ void _round_starter_interrupt_routine_end(){
 // This function can be deleted
 // This was for testing and check purpose
 void temp_test(){
-	int score = score_mapper_score_get();
-	_servo_display_update_score_ones_digit(score);
-	_servo_display_update_score_tens_digit(score);
+
 }
 
 int main(){
