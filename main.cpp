@@ -425,6 +425,7 @@ void _game_round_time_decrement(){
 void _game_game_start_routine(){
 	game_score = GAME_INITIAL_SCORE;
 	game_round_time = GAME_INITIAL_ROUND_TIME;
+	game_observer_update();
 
 	game_stage = GAME_STAGE_PLAYING;
 	_game_round_time_ticker_enable();
@@ -436,7 +437,7 @@ void _game_game_over_timeout_routine(){
 	_game_round_time_ticker_disable();
 	_game_observer_updater_ticker_disable();
 
-	game_display_update(); // display to know the game stage is idle
+	game_observer_update(); // update observer at the end of round
 }
 
 void _game_observer_updater_ticker_enable(){
@@ -452,7 +453,7 @@ void _game_observer_updater_ticker_routine(){
 }
 
 
-// Function for the round starter
+// Function for the round_starter
 void round_starter_interrupt_enable(){
 	round_starter_interrupt.rise(round_starter_interrupt_routine);
 }
@@ -489,7 +490,7 @@ void difficulty_setter_update(){
 	} else if (game_score < 30){
 		hopper_delay_set(0.10);
 	} else {
-		hopper_delay_set(0.07);
+		hopper_delay_set(0.06);
 	}
 	
 }
