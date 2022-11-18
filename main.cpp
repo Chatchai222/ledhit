@@ -75,8 +75,8 @@ int game_stage = GAME_STAGE_IDLE;
 Ticker game_round_time_ticker;
 const float GAME_ROUND_TIME_TICKER_DELAY = 1;
 Timeout game_game_over_timeout;
-Ticker game_display_updater_ticker;
-const float GAME_DISPLAY_UPDATER_TICKER_DELAY = 0.2;
+Ticker game_observer_updater_ticker;
+const float GAME_OBSERVER_UPDATER_TICKER_DELAY = 0.2;
 
 Timeout round_starter_timeout;
 InterruptIn round_starter_interrupt(P0_2); // this will be connected to button
@@ -126,6 +126,7 @@ void _servo_display_update_score_ones_digit(int);
 void _servo_display_update_round_time();
 
 void game_start();
+void game_observer_update();
 void game_display_update();
 void game_difficulty_update();
 void game_add_score_from_score_mapper();
@@ -139,9 +140,9 @@ void _game_round_time_ticker_routine();
 void _game_round_time_decrement();
 void _game_game_start_routine();
 void _game_game_over_timeout_routine();
-void _game_display_updater_ticker_enable();
-void _game_display_updater_ticker_disable();
-void _game_display_updater_ticker_routine();
+void _game_observer_updater_ticker_enable();
+void _game_observer_updater_ticker_disable();
+void _game_observer_updater_ticker_routine();
 
 void round_starter_interrupt_enable();
 void round_starter_interrupt_disable();
@@ -365,6 +366,11 @@ void game_start(){
 	}
 }
 
+void game_observer_update(){
+	game_difficulty_update();
+	game_display_update();
+}
+
 void game_display_update(){
 	servo_display_update();
 }
@@ -422,29 +428,28 @@ void _game_game_start_routine(){
 
 	game_stage = GAME_STAGE_PLAYING;
 	_game_round_time_ticker_enable();
-	_game_display_updater_ticker_enable();
+	_game_observer_updater_ticker_enable();
 }
 
 void _game_game_over_timeout_routine(){
 	game_stage = GAME_STAGE_IDLE;
 	_game_round_time_ticker_disable();
-	_game_display_updater_ticker_disable();
+	_game_observer_updater_ticker_disable();
 
 	game_display_update(); // display to know the game stage is idle
 }
 
-void _game_display_updater_ticker_enable(){
-	game_display_updater_ticker.attach(_game_display_updater_ticker_routine, GAME_DISPLAY_UPDATER_TICKER_DELAY);
+void _game_observer_updater_ticker_enable(){
+	game_observer_updater_ticker.attach(_game_observer_updater_ticker_routine, GAME_OBSERVER_UPDATER_TICKER_DELAY);
 }
 
-void _game_display_updater_ticker_disable(){
-	game_display_updater_ticker.detach();
+void _game_observer_updater_ticker_disable(){
+	game_observer_updater_ticker.detach();
 }
 
-void _game_display_updater_ticker_routine(){
-	game_display_update();
+void _game_observer_updater_ticker_routine(){
+	game_observer_update();
 }
-
 
 
 // Function for the round starter
@@ -474,10 +479,21 @@ void _round_starter_interrupt_routine_end(){
 }
 
 
-// Function for difficulty_stter
+// Function for difficulty_setter
 void difficulty_setter_update(){
+	int game_score = game_score_get();
+	if(game_score < 10){ // Level 0
+		hopper_delay_set(0.20);
+	} else if (game_score < 20){
+		hopper_delay_set(0.15);
+	} else if (game_score < 30){
+		hopper_delay_set(0.10);
+	} else {
+		hopper_delay_set(0.07);
+	}
 	
 }
+
 
 // This function can be deleted
 // This was for testing and check purpose
