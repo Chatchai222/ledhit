@@ -34,7 +34,7 @@ const int BLINKER_BLINK_AMOUNT = 6;
 
 const int SCORE_MAPPER_ARRAY_SIZE = 7;
 const int SCORE_MAPPER_SCORE_ARRAY[SCORE_MAPPER_ARRAY_SIZE] = {
-	0, 1, 2, 3, 4, 5, 6
+	-3, 4, -3, -1, 2, 2, -1
 };
 
 Timeout clicker_timeout;
