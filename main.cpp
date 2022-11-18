@@ -60,9 +60,9 @@ const PinName SERVO_LINE_PIN_NAME_ARRAY[SERVO_LINE_ARRAY_SIZE] = {
 };
 std::vector<PwmOut> servo_line_pwm_out_vector;
 
-const int SERVO_DISPLAY_GAME_STAGE_SERVO_LINE_INDEX = 0;
-const int SERVO_DISPLAY_SCORE_TENS_DIGIT_SERVO_LINE_INDEX = 1;
-const int SERVO_DISPLAY_SCORE_ONES_DIGIT_SERVO_LINE_INDEX = 2;
+const int SERVO_DISPLAY_GAME_STAGE_SERVO_LINE_INDEX = 2;
+const int SERVO_DISPLAY_SCORE_TENS_DIGIT_SERVO_LINE_INDEX = 0;
+const int SERVO_DISPLAY_SCORE_ONES_DIGIT_SERVO_LINE_INDEX = 1;
 const int SERVO_DISPLAY_ROUND_TIME_SERVO_LINE_INDEX = 3;
 
 // stud for display; since display is more of an interface
@@ -167,7 +167,9 @@ void difficulty_setter_initialize();
 void difficulty_setter_update();
 
 void initialize_all();
-void temp_test();
+
+void test_temp();
+void test_calibrate_servo();
 
 
 
@@ -298,7 +300,7 @@ void _clicker_interrupt_routine_begin(){
 	blinker_ticker_enable();
 	clicker_led.write(0);
 
-	temp_test();
+	test_temp();
 	game_add_score_from_score_mapper();
 
 }
@@ -376,7 +378,7 @@ void servo_display_update(){
 
 void _servo_display_update_game_stage(){
 	int game_stage = game_stage_get();
-	float position_percent = game_stage * 0.5;
+	float position_percent = game_stage * 1;
 	servo_line_position_percent_set(SERVO_DISPLAY_GAME_STAGE_SERVO_LINE_INDEX, position_percent);
 }
 
@@ -397,12 +399,12 @@ void _servo_display_update_score(){
 }
 
 void _servo_display_update_score_tens_digit(int in_score){
-	float position_percent = in_score / 10.0;
+	float position_percent = in_score * (1.0/9.0);
 	servo_line_position_percent_set(SERVO_DISPLAY_SCORE_TENS_DIGIT_SERVO_LINE_INDEX, position_percent);
 }
 
 void _servo_display_update_score_ones_digit(int in_score){
-	float position_percent = in_score / 10.0;
+	float position_percent = in_score * (1.0/9.0);
 	servo_line_position_percent_set(SERVO_DISPLAY_SCORE_ONES_DIGIT_SERVO_LINE_INDEX, position_percent);
 }
 
@@ -594,10 +596,27 @@ void initialize_all(){
 	difficulty_setter_initialize();
 }
 
-// This function can be deleted
-// This was for testing and check purpose
-void temp_test(){
 
+// Functions for testing purposes only
+void test_temp(){
+
+}
+
+// testing if servo toothpick matches the paper scale
+void test_calibrate_servo(){
+	for(int n = 0; n < 3; n++){
+		for(int i = 0; i < 10; i++){
+			servo_line_position_percent_set(0, i * (1.0/9.0));
+			servo_line_position_percent_set(1, i * (1.0/9.0));
+			servo_line_position_percent_set(2, i * (1.0/9.0));
+			servo_line_position_percent_set(3, i * (1.0/9.0));
+			wait(1.5);
+		}
+	}
+	servo_line_position_percent_set(0, 0);
+	servo_line_position_percent_set(1, 0);
+	servo_line_position_percent_set(2, 0);
+	servo_line_position_percent_set(3, 0);
 }
 
 
@@ -605,7 +624,6 @@ int main(){
 	initialize_all();
 	
 
-	temp_test();
 
 	// The while loop keep the program running forever
 	while(1){
