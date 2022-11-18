@@ -450,6 +450,7 @@ void _game_game_start_routine(){
 	game_score = GAME_INITIAL_SCORE;
 	game_round_time = GAME_INITIAL_ROUND_TIME;
 	game_observer_update();
+	hopper_ticker_enable();
 
 	game_stage = GAME_STAGE_PLAYING;
 	_game_round_time_ticker_enable();
