@@ -66,7 +66,7 @@ const int SERVO_DISPLAY_ROUND_TIME_SERVO_LINE_INDEX = 3;
 
 // stud for display; since display is more of an interface
 
-const int GAME_INITIAL_ROUND_TIME = 30;
+const int GAME_INITIAL_ROUND_TIME = 90;
 const int GAME_INITIAL_SCORE = 0;
 const int GAME_STAGE_IDLE = 0;
 const int GAME_STAGE_PLAYING = 1;
@@ -506,17 +506,20 @@ void difficulty_setter_update(){
 		hopper_hop_amount_set(1);
 		hopper_delay_set(0.15);
 	} else if (game_score < 30){
+		hopper_hop_amount_set(2);
+		hopper_delay_set(0.30);
+	} else if (game_score < 40){
 		hopper_hop_amount_set(1);
 		hopper_delay_set(0.10);
-	} else if (game_score < 40){
+	} else if (game_score < 50){
+		hopper_hop_amount_set(1);
+		hopper_delay_set(0.08);
+	} else if (game_score < 60){
 		hopper_hop_amount_set(2);
 		hopper_delay_set(0.20);
-	} else if (game_score < 50){
-		hopper_hop_amount_set(2);
-		hopper_delay_set(0.15);
-	} else {
-		hopper_hop_amount_set(2);
-		hopper_delay_set(0.10);
+	} else if (game_score < 70){
+		hopper_hop_amount_set(1);
+		hopper_delay_set(0.05);
 	}
 	
 }
