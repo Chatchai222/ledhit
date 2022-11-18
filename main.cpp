@@ -27,6 +27,7 @@ int led_line_current_index = 0;
 
 Ticker hopper_ticker;
 float hopper_delay = 0.2;
+int hopper_hop_amount = 1;
 
 Ticker blinker_ticker;
 const int BLINKER_BLINK_AMOUNT = 6;
@@ -87,13 +88,15 @@ DigitalOut round_starter_led(P0_3, 1);
 // Defining functions
 void led_line_initialize();
 void led_line_hop();
+void led_line_hop_by(int);
 void led_line_current_led_toggle();
 int led_line_current_led_index_get();
 
 void hopper_ticker_routine();
 void hopper_ticker_enable();
 void hopper_ticker_disable();
-void hopper_delay_set();
+void hopper_delay_set(float);
+void hopper_hop_amount_set(int);
 
 void blinker_ticker_routine();
 void blinker_ticker_enable();
@@ -165,8 +168,16 @@ void led_line_initialize(){
 }
 
 void led_line_hop(){
+	led_line_hop_by(1);
+}
+
+void led_line_hop_by(int in_hop_by){
+	int amount_to_hop = in_hop_by;
+	if(amount_to_hop < 0){
+		amount_to_hop = 0;
+	}
 	led_line_digital_out_vector.at(led_line_current_index).write(0);
-	led_line_current_index++;
+	led_line_current_index += amount_to_hop;
 	led_line_current_index %= LED_LINE_ARRAY_SIZE;
 	led_line_digital_out_vector.at(led_line_current_index).write(1);
 }
@@ -182,7 +193,7 @@ int led_line_current_led_index_get(){
 
 // Functions for hopper
 void hopper_ticker_routine(){
-	led_line_hop();
+	led_line_hop_by(hopper_hop_amount);
 }
 
 void hopper_ticker_enable(){
@@ -196,6 +207,11 @@ void hopper_ticker_disable(){
 void hopper_delay_set(float second){
 	hopper_delay = second;
 }
+
+void hopper_hop_amount_set(int in_amount){
+	hopper_hop_amount = in_amount;
+}
+
 
 
 // Function for blinker 
@@ -484,13 +500,23 @@ void _round_starter_interrupt_routine_end(){
 void difficulty_setter_update(){
 	int game_score = game_score_get();
 	if(game_score < 10){ // Level 0
+		hopper_hop_amount_set(1);
 		hopper_delay_set(0.20);
 	} else if (game_score < 20){
+		hopper_hop_amount_set(1);
 		hopper_delay_set(0.15);
 	} else if (game_score < 30){
+		hopper_hop_amount_set(1);
 		hopper_delay_set(0.10);
+	} else if (game_score < 40){
+		hopper_hop_amount_set(2);
+		hopper_delay_set(0.20);
+	} else if (game_score < 50){
+		hopper_hop_amount_set(2);
+		hopper_delay_set(0.15);
 	} else {
-		hopper_delay_set(0.06);
+		hopper_hop_amount_set(2);
+		hopper_delay_set(0.10);
 	}
 	
 }
