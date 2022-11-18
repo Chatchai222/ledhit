@@ -28,6 +28,7 @@ int led_line_current_index = 0;
 Ticker hopper_ticker;
 float hopper_delay = 0.2;
 int hopper_hop_amount = 1;
+const int HOPPER_FIXED_HOP_AMOUNT_AFTER_BLINK = 2;
 
 Ticker blinker_ticker;
 const int BLINKER_BLINK_AMOUNT = 6;
@@ -97,6 +98,7 @@ void hopper_ticker_enable();
 void hopper_ticker_disable();
 void hopper_delay_set(float);
 void hopper_hop_amount_set(int);
+void hopper_fixed_hop_amount_after_blink_hop();
 
 void blinker_ticker_routine();
 void blinker_ticker_enable();
@@ -212,6 +214,10 @@ void hopper_hop_amount_set(int in_amount){
 	hopper_hop_amount = in_amount;
 }
 
+void hopper_fixed_hop_amount_after_blink_hop(){
+	led_line_hop_by(HOPPER_FIXED_HOP_AMOUNT_AFTER_BLINK);
+}
+
 
 
 // Function for blinker 
@@ -276,6 +282,8 @@ void _clicker_interrupt_routine_end(){
 	hopper_ticker_enable();
 	clicker_interrupt_enable();
 	clicker_led.write(1);
+
+	hopper_fixed_hop_amount_after_blink_hop(); // prevent player from just spam click the clicker when on favorable led_line index
 }
 
 
