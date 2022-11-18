@@ -93,6 +93,7 @@ void led_line_hop_by(int);
 void led_line_current_led_toggle();
 int led_line_current_led_index_get();
 
+void hopper_initialize();
 void hopper_ticker_routine();
 void hopper_ticker_enable();
 void hopper_ticker_disable();
@@ -100,13 +101,16 @@ void hopper_delay_set(float);
 void hopper_hop_amount_set(int);
 void hopper_fixed_hop_amount_after_blink_hop();
 
+void blinker_initialize();
 void blinker_ticker_routine();
 void blinker_ticker_enable();
 void blinker_ticker_disable();
 float _blinker_blink_delay_get();
 
+void score_mapper_initialize();
 int score_mapper_score_get();
 
+void clicker_initialize();
 void clicker_interrupt_enable();
 void clicker_interrupt_disable();
 void clicker_interrupt_routine();
@@ -114,6 +118,7 @@ float clicker_cooldown_get();
 void _clicker_interrupt_routine_begin();
 void _clicker_interrupt_routine_end();
 
+void HS_311_initialize();
 float HS_311_pwm_period_second_get();
 int HS_311_pwm_pulsewidth_microsecond_get_from_position_degree(int);
 int HS_311_pwm_pulsewidth_microsecond_get_from_position_percent(float);
@@ -123,6 +128,7 @@ void servo_line_initialize();
 void servo_line_position_degree_set(int index, int degree);
 void servo_line_position_percent_set(int index, float percent);
 
+void servo_display_initialize();
 void servo_display_update();
 void _servo_display_update_game_stage();
 void _servo_display_update_score();
@@ -130,6 +136,7 @@ void _servo_display_update_score_tens_digit(int);
 void _servo_display_update_score_ones_digit(int);
 void _servo_display_update_round_time();
 
+void game_initialize();
 void game_start();
 void game_observer_update();
 void game_display_update();
@@ -149,14 +156,17 @@ void _game_observer_updater_ticker_enable();
 void _game_observer_updater_ticker_disable();
 void _game_observer_updater_ticker_routine();
 
+void round_starter_initialize();
 void round_starter_interrupt_enable();
 void round_starter_interrupt_disable();
 void round_starter_interrupt_routine();
 void _round_starter_interrupt_routine_begin();
 void _round_starter_interrupt_routine_end();
 
+void difficulty_setter_initialize();
 void difficulty_setter_update();
 
+void initialize_all();
 void temp_test();
 
 
@@ -194,6 +204,10 @@ int led_line_current_led_index_get(){
 
 
 // Functions for hopper
+void hopper_initialize(){
+	hopper_ticker_enable();
+}
+
 void hopper_ticker_routine(){
 	led_line_hop_by(hopper_hop_amount);
 }
@@ -221,6 +235,10 @@ void hopper_fixed_hop_amount_after_blink_hop(){
 
 
 // Function for blinker 
+void blinker_initialize(){
+	; // intentionally empty
+}
+
 void blinker_ticker_routine(){
 	led_line_current_led_toggle();
 }
@@ -242,6 +260,10 @@ float _blinker_blink_delay_get(){
 
 
 // Function for score mapper
+void score_mapper_initialize(){
+	;// intentionally empty
+}
+
 int score_mapper_score_get(){
 	int index_to_map_to_score = led_line_current_led_index_get();
 	return SCORE_MAPPER_SCORE_ARRAY[index_to_map_to_score];
@@ -249,6 +271,10 @@ int score_mapper_score_get(){
 
 
 // Function for clicker
+void clicker_initialize(){
+	clicker_interrupt_enable();
+}
+
 void clicker_interrupt_enable(){
 	clicker_interrupt.rise(clicker_interrupt_routine);
 }
@@ -288,6 +314,10 @@ void _clicker_interrupt_routine_end(){
 
 
 // HS_311 servo motor function
+void HS_311_initialize(){
+	; // intentionally empty
+}
+
 float HS_311_pwm_period_second_get(){
 	return HS_311_PWM_PERIOD_SECOND;
 }
@@ -334,6 +364,10 @@ void servo_line_position_percent_set(int index, float percent){
 
 
 // Function servo_display (which is a concrete implementation of display)
+void servo_display_initialize(){
+	; // intentionally empty
+}
+
 void servo_display_update(){
 	_servo_display_update_game_stage();
 	_servo_display_update_score();
@@ -381,6 +415,10 @@ void _servo_display_update_round_time(){
 
 
 // Function for game (state)
+void game_initialize(){
+	; // intentionally empty
+}
+
 void game_start(){
 	if(game_stage == GAME_STAGE_PLAYING){
 		return;
@@ -479,6 +517,10 @@ void _game_observer_updater_ticker_routine(){
 
 
 // Function for the round_starter
+void round_starter_initialize(){
+	round_starter_interrupt_enable();
+}
+
 void round_starter_interrupt_enable(){
 	round_starter_interrupt.rise(round_starter_interrupt_routine);
 }
@@ -506,6 +548,10 @@ void _round_starter_interrupt_routine_end(){
 
 
 // Function for difficulty_setter
+void difficulty_setter_initialize(){
+	; // intentionally empty
+}
+
 void difficulty_setter_update(){
 	int game_score = game_score_get();
 	if(game_score < 10){ // Level 0
@@ -534,20 +580,29 @@ void difficulty_setter_update(){
 }
 
 
+void initialize_all(){
+	led_line_initialize();
+	hopper_initialize();
+	blinker_initialize();
+	score_mapper_initialize();
+	clicker_initialize();
+	HS_311_initialize();
+	servo_line_initialize();
+	servo_display_initialize();
+	game_initialize();
+	round_starter_initialize();
+	difficulty_setter_initialize();
+}
+
 // This function can be deleted
 // This was for testing and check purpose
 void temp_test(){
 
 }
 
+
 int main(){
-	led_line_initialize();
-	hopper_ticker_enable();
-	clicker_interrupt_enable();
-
-	servo_line_initialize();
-
-	round_starter_interrupt_enable();
+	initialize_all();
 	
 
 	temp_test();
